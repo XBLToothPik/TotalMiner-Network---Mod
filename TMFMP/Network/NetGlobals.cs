@@ -7,11 +7,12 @@ using System.Net;
 using System.Net.Sockets;
 using StudioForge.Engine.Net;
 using StudioForge.TotalMiner.API;
+using TMFMP.Network.Data;
 namespace TMFMP.Network
 {
     public static class NetGlobals
     {
-        public static string IP = "74.208.169.59";//"74.208.169.59";
+        public static string IP = "localhost";//"74.208.169.59";
         public static int Port = 5786;
         public static ITMNetworkManager NetworkManager;
         public static ITMPluginNet NetPlugin;

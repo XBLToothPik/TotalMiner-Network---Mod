@@ -11,7 +11,7 @@ namespace TMFMP
     {
         public ITMNetworkManager GetNetworkManager()
         {
-            return (NetGlobals.NetworkManager = new PluginNetworkManager());
+            return (NetGlobals.NetworkManager ?? (NetGlobals.NetworkManager = new PluginNetworkManager()));
         }
     }
 }

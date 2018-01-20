@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using StudioForge.Engine.Net;
+using TMFMP.Network.Data;
 namespace TMFMP.Network
 {
     public static class NetMethods

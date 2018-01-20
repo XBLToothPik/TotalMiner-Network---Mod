@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-namespace TMFMP.Network
+namespace TMFMP.Network.Data
 {
     public struct Packet
     {

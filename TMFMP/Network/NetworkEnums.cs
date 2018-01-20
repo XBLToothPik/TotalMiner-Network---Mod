@@ -48,7 +48,5 @@ namespace TMFMP.Network
         CreateSession,
         JoinSession,
         GetSessions
-
     }
-
 }
