@@ -30,5 +30,24 @@ namespace TMFMP
         {
             StudioForge.TotalMiner.Globals1.DeleteBehaviourTree(tree.TreeType, tree.Name);
         }
+        public static void Copy(this SessionProperties from, SessionProperties to)
+        {
+            to.SessionType = from.SessionType;
+            to.SessionState = from.SessionState;
+            to.ExeVersion = from.ExeVersion;
+            to.MapName = from.MapName;
+            to.OwnerName = from.OwnerName;
+            to.HostName = from.HostName;
+            to.GameMode = from.GameMode;
+            to.Attribute = from.Attribute;
+            to.CurrentPlayerCount = from.CurrentPlayerCount;
+            to.RatingAvgStars = from.RatingAvgStars;
+            to.RatingsCount = from.RatingsCount;
+            to.SkillsEnabled = from.SkillsEnabled;
+            to.SkillsLocal = from.SkillsLocal;
+            to.CombatEnabled = from.CombatEnabled;
+            to.DefaultPermission = from.DefaultPermission;
+            to.ModsEnabledCount = from.ModsEnabledCount;
+        }
     }
 }

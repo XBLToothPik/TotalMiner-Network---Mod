@@ -146,11 +146,10 @@ namespace TMFMP.Network
         }
         private static void ReadInternalData_SessionUpdated_SessionStateUpdate(PacketReader reader, short sender)
         {
-            SessionUpdateType type = (SessionUpdateType)reader.ReadByte();
             NetworkSessionState newState = (NetworkSessionState)reader.ReadByte();
             if (NetGlobals.NetSession != null)
             {
-                NetGlobals.NetSession.SetSessionState(newState);
+                NetGlobals.NetSession.ExtendedProperties.SessionState = newState;
             }
         }
 
@@ -181,27 +180,49 @@ namespace TMFMP.Network
             }
         }
 
+      
+
+   
+
+        #region Immediate Network methods
         public static void SendEndSession()
         {
             if (NetGlobals.NetSession != null && NetGlobals.CurrentConnection.IsConnected())
             {
-                BinaryWriter writer = new BinaryWriter(NetGlobals.CurrentConnection.GetStream());
-                writer.Write((byte)PacketType.Internal);
-                writer.Write((short)0);
-                writer.Write((byte)CustomInternalPacket.SessionUpdate);
-                writer.Write((byte)SessionUpdateType.SessionEnd);
-                writer.Flush();
+               Packet newPacket = default(Packet);
+               newPacket.Sender = 0;
+               newPacket.Target = 0;
+               newPacket.Data = new byte[2] { (byte)CustomInternalPacket.SessionUpdate, (byte)SessionUpdateType.SessionEnd };
+               SendInternalPacketNow(newPacket);
             }
         }
-
-        public static void QueueSessionStateUpdate(NetworkSessionState newState)
+        public static void SendSessionStateUpdate(NetworkSessionState newState)
         {
             if (NetGlobals.NetSession != null)
             {
                 Packet updatePacket = default(Packet);
+                updatePacket.Target = 0;
+                updatePacket.Sender = 0;
                 updatePacket.Data = new byte[3] { (byte)CustomInternalPacket.SessionUpdate, (byte)SessionUpdateType.StateUpdate, (byte)newState };
-                NetGlobals.InternalConnectionPacketBuffer_Out.Enqueue(updatePacket);
+                SendInternalPacketNow(updatePacket);
             }
         }
+        public static void SendInternalPacketNow(Packet rawData)
+        {
+            if (NetGlobals.NetSession != null && NetGlobals.CurrentConnection.IsConnected())
+            {
+                byte[] _packetType = new byte[] { (byte)PacketType.Internal };
+                byte[] _target = BitConverter.GetBytes(rawData.Target);
+                byte[] _data = rawData.Data;
+
+                byte[] _allData = new byte[_packetType.Length + _target.Length + _data.Length];
+                
+                Buffer.BlockCopy(_packetType, 0, _allData, 0, _packetType.Length);
+                Buffer.BlockCopy(_target, 0, _allData, _packetType.Length, _target.Length);
+                Buffer.BlockCopy(_data, 0, _allData, _packetType.Length + _target.Length, _data.Length);
+                NetGlobals.CurrentConnection.GetStream().Write(_allData, 0, _allData.Length);
+            }
+        }
+        #endregion
     }
 }

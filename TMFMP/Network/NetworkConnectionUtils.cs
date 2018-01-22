@@ -8,11 +8,12 @@ using StudioForge.Engine.Net;
 using System.IO;
 using TMFMP.PluginInterfaces;
 using StudioForge.Engine.GamerServices;
+using StudioForge.TotalMiner;
 namespace TMFMP.Network
 {
     public static class NetworkConnectionUtils
     {
-        public static bool SendJoinSession(string ip, int port, int exeVersion, Gamer myGamer, PluginAvailableNetworkSession targetSession, out PluginNetworkSession resultSession, out List<NetworkGamer> existingRemotes, out TcpClient resultConnection)
+        public static bool SendJoinSession(string ip, int port, Gamer myGamer, PluginAvailableNetworkSession targetSession, out PluginNetworkSession resultSession, out List<NetworkGamer> existingRemotes, out TcpClient resultConnection)
         {
             resultSession = null;
             resultConnection = null;
@@ -29,8 +30,7 @@ namespace TMFMP.Network
 
                     writer.Write((byte)Master_Server_Op_Out.Connect);
                     writer.Write((byte)Master_Server_ConnectionType.JoinSession);
-                    writer.Write(targetSession.SessionID);
-                    writer.Write(exeVersion);
+                    writer.Write(targetSession.ExtendedProperties.SessionID);
                     writer.Write(myGamer.ID.ID);
                     writer.Write(myGamer.Gamertag);
                     writer.Flush();
@@ -59,7 +59,7 @@ namespace TMFMP.Network
                                     }
                                     
                                 }
-                                resultSession = new PluginNetworkSession(new StudioForge.Engine.GamerServices.Gamer(new GamerID(targetSession.HostGID), targetSession.HostGamertag), myGamer, targetSession.SessionProperties, targetSession.SessionType, NetworkSessionState.Playing);
+                                resultSession = new PluginNetworkSession(new StudioForge.Engine.GamerServices.Gamer(new GamerID(targetSession.ExtendedProperties.HostID), targetSession.ExtendedProperties.HostName), myGamer, targetSession.ExtendedProperties);
                                 resultConnection = connection;
                                 return true;
                             }
@@ -75,7 +75,7 @@ namespace TMFMP.Network
                 return false;
             }
         }
-        public static bool SendGetSessions(string ip, int port, int exeVersion, ref List<IAvailableNetworkSession> sessionsFound)
+        public static bool SendGetSessions(string ip, int port, ref List<IAvailableNetworkSession> sessionsFound)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace TMFMP.Network
 
                     writer.Write((byte)Master_Server_Op_Out.Connect);
                     writer.Write((byte)Master_Server_ConnectionType.GetSessions);
-                    writer.Write(exeVersion);
+                   // writer.Write(exeVersion);
                     writer.Flush();
 
                     Master_Server_Op_In opIn = (Master_Server_Op_In)reader.ReadByte();
@@ -100,26 +100,9 @@ namespace TMFMP.Network
                             int count = reader.ReadInt32();
                             for (int i = 0; i < count; i++)
                             {
-                                string hostName = reader.ReadString();
-                                short hostGid = reader.ReadInt16();
-                                int sessExeVersion = reader.ReadInt32();
-                                int sessID = reader.ReadInt32();
-                                int pCount = reader.ReadInt32();
-                                NetworkSessionState state = (NetworkSessionState)reader.ReadByte();
-                                NetworkSessionType netType = (NetworkSessionType)reader.ReadByte();
-                                
-                                if (sessExeVersion == exeVersion)
-                                {
-                                    NetworkSessionPropertiesExtended properties = new NetworkSessionPropertiesExtended();
-                                    properties[0] = (sessExeVersion << 4) | (0 & 0xF); //TEMP
-                                    properties[7] = pCount;
-                                    properties.EXEVersion = sessExeVersion;
-                                    properties.HostGID = hostGid;
-                                    properties.HostName = hostName;
-                                    properties.SessionID = sessID;
-                                    PluginAvailableNetworkSession newSession = new PluginAvailableNetworkSession(properties);
-                                    sessionsFound.Add(newSession);
-                                }
+                                SessionPropertiesExtended prop = SessionPropertiesExtended.Read(reader);
+                                PluginAvailableNetworkSession newSession = new PluginAvailableNetworkSession(prop);
+                                sessionsFound.Add(newSession);
                             }
                         }
                     }
@@ -131,7 +114,7 @@ namespace TMFMP.Network
                 return false;
             }
         }
-        public static bool SendCreateSession(string ip, int port, int exeVersion, short hostGID, string hostName, NetworkSessionType sessionType, NetworkSessionState state, out int newSessionID, out TcpClient newConnection)
+        public static bool SendCreateSession(string ip, int port, SessionProperties properties, short hostGID, out int newSessionID, out TcpClient newConnection)
         {
             newSessionID = -1;
             try
@@ -144,11 +127,15 @@ namespace TMFMP.Network
                     BinaryReader reader = new BinaryReader(connection.GetStream());
                     writer.Write((byte)Master_Server_Op_Out.Connect);
                     writer.Write((byte)Master_Server_ConnectionType.CreateSession);
-                    writer.Write(exeVersion);
-                    writer.Write(hostGID);
-                    writer.Write(hostName);
-                    writer.Write((byte)sessionType);
-                    writer.Write((byte)state);
+
+                    SessionPropertiesExtended newProp = new SessionPropertiesExtended()
+                    {
+                        HostID = hostGID,
+                        NetType = NetworkSessionType.PlayerMatch
+                    };
+                    properties.Copy(newProp); 
+                    newProp.Write(writer);
+
                     Master_Server_Op_In opIn = (Master_Server_Op_In)reader.ReadByte();
                     if (opIn == Master_Server_Op_In.Connect)
                     {

@@ -139,12 +139,12 @@
     <Compile Include="Events\NetEvents.cs" />
     <Compile Include="IO\IOMethods.cs" />
     <Compile Include="Network\Data\MemBuffer.cs" />
+    <Compile Include="Network\SessionPropertiesExtended.cs" />
     <Compile Include="Network\NetGlobals.cs" />
     <Compile Include="Network\NetMethods.cs" />
     <Compile Include="Network\NetworkConnectionUtils.cs" />
     <Compile Include="Network\NetworkEnums.cs" />
     <Compile Include="Network\NetworkExtensions.cs" />
-    <Compile Include="Network\NetworkSessionPropertiesExtended.cs" />
     <Compile Include="Network\Data\Packet.cs" />
     <Compile Include="PluginInterfaces\PluginAvailableNetworkSession.cs" />
     <Compile Include="PluginInterfaces\PluginMain.cs" />

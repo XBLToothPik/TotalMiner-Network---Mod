@@ -7,7 +7,7 @@ using StudioForge.Engine.Net;
 using StudioForge.Engine.GamerServices;
 using System.Net.Sockets;
 using TMFMP.Network;
-
+using StudioForge.TotalMiner;
 namespace TMFMP.PluginInterfaces
 {
     public class PluginNetworkSession : INetworkSession
@@ -68,9 +68,9 @@ namespace TMFMP.PluginInterfaces
         private List<NetworkGamer> _RemoteGamers;
         private NetworkGamer _myGamer;
         private NetworkGamer _Host;
-        private NetworkSessionProperties _Properties;
-        private NetworkSessionType _SessionType;
-        private NetworkSessionState _SessionState;
+        private SessionProperties _Properties;
+
+        private NetworkSessionType _NetType;
         #endregion
 
         #region Accessor Vars
@@ -136,33 +136,41 @@ namespace TMFMP.PluginInterfaces
                 return Host.ID == MyGamer.ID;
             }
         }
-        public NetworkSessionProperties SessionProperties
-        {
-            get
-            {
-                return _Properties;
-            }
-        }
         public NetworkSessionState SessionState
         {
             get
             {
-                return _SessionState;
+                return _Properties.SessionState;
             }
         }
         public NetworkSessionType SessionType
         {
             get
             {
-                return _SessionType;
+                return _NetType;
             }
         }
 
+        public object SessionProperties
+        {
+            get 
+            {
+                return _Properties;
+            }
+        }
+        public SessionPropertiesExtended ExtendedProperties
+        {
+            get
+            {
+                return (SessionPropertiesExtended)_Properties;
+            }
+        }
         #endregion
 
         #region CTORS
-        public PluginNetworkSession(Gamer host, Gamer myGamer, NetworkSessionProperties properties, NetworkSessionType type, NetworkSessionState state)
+        public PluginNetworkSession(Gamer host, Gamer myGamer, SessionPropertiesExtended extendedProperties)
         {
+            _NetType = NetworkSessionType.PlayerMatch;
             _AllGamers = new List<NetworkGamer>();
             _LocalGamers = new List<NetworkGamer>();
             _RemoteGamers = new List<NetworkGamer>();
@@ -173,9 +181,7 @@ namespace TMFMP.PluginInterfaces
 
             _myGamer.AddGamerState(GamerStates.Local);
 
-            _Properties = properties;
-            _SessionType = type;
-            _SessionState = state;
+            _Properties = extendedProperties;
 
             if (IsHost)
             {
@@ -194,17 +200,14 @@ namespace TMFMP.PluginInterfaces
         #endregion
 
         #region Helper Methods
-        public void SetSessionState(NetworkSessionState newState)
-        {
-            _SessionState = newState;
-        }
         public void RemoveGamerByID(GamerID id)
         {
             NetworkGamer targetGamer = _AllGamers.Find(x => x.ID == id);
-            if (targetGamer != null)
-                this.RaiseGamerLeft(targetGamer);
             _AllGamers.RemoveAll(x => x.ID == id);
             _RemoteGamers.RemoveAll(x => x.ID == id);
+            if (targetGamer != null)
+                this.RaiseGamerLeft(targetGamer);
+            
         }
         public NetworkGamer FindGamerById(GamerID id)
         {
@@ -220,16 +223,18 @@ namespace TMFMP.PluginInterfaces
         #region Session Methods
         public void EndGame()
         {
+
         }
 
         public void StartGame()
         {
             this.GameStarted(this, new GameEventArgs());
-
             if (IsHost)
             {
-                NetMethods.QueueSessionStateUpdate(NetworkSessionState.Playing);
+                NetMethods.SendSessionStateUpdate(NetworkSessionState.Playing);
             }
+            
+
         }
 
         public void Update()
@@ -248,5 +253,6 @@ namespace TMFMP.PluginInterfaces
 
         }
         #endregion
+
     }
 }

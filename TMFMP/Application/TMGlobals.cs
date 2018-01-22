@@ -6,5 +6,5 @@ using System.Text;
 
 public static class TMGlobals
 {
-    public static int TotalMinerEXEVersion;
+
 }

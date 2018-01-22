@@ -8,8 +8,10 @@ using TMFMP.Network;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
+using TMFMP;
 using TMFMP.IO;
 using TMFMP.Network.Data;
+using StudioForge.TotalMiner;
 namespace TMFMP.PluginInterfaces
 {
     public class PluginNetworkManager : ITMNetworkManager
@@ -24,22 +26,26 @@ namespace TMFMP.PluginInterfaces
         }
         #endregion
 
-        #region Init
-        public void Initialize(int exeVersion)
+        #region CTORS
+        public PluginNetworkManager()
         {
             NetGlobals.InitNetGlobals();
-            TMGlobals.TotalMinerEXEVersion = exeVersion;
+        }
+        public void Initialize(int exeVersion)
+        {
         }
         #endregion
 
         #region Session Methods
-        public INetworkSession CreateSession(NetworkSessionType type, StudioForge.Engine.GamerServices.Gamer host)
+        public INetworkSession CreateSession(NetworkSessionType type, StudioForge.Engine.GamerServices.Gamer host, SessionProperties properties)
         {
             NetGlobals.MyGamer = new NetworkGamer(host.ID, host.Gamertag);
             int newSessionID = -1;
-            if (NetworkConnectionUtils.SendCreateSession(NetGlobals.IP, NetGlobals.Port, TMGlobals.TotalMinerEXEVersion, host.ID.ID, host.Gamertag, type, NetworkSessionState.Lobby, out newSessionID, out NetGlobals.CurrentConnection))
+            if (NetworkConnectionUtils.SendCreateSession(NetGlobals.IP, NetGlobals.Port, properties, host.ID.ID, out newSessionID, out NetGlobals.CurrentConnection))
             {
-                PluginNetworkSession createdSession = (NetGlobals.NetSession = new PluginNetworkSession(host, host, new NetworkSessionProperties(), type, NetworkSessionState.Lobby));
+                SessionPropertiesExtended newProp = new SessionPropertiesExtended();
+                properties.Copy(newProp);
+                PluginNetworkSession createdSession = (NetGlobals.NetSession = new PluginNetworkSession(host, host, newProp));
                 return createdSession;
             }
             return null;
@@ -52,7 +58,7 @@ namespace TMFMP.PluginInterfaces
                 EndSession();
                 PluginAvailableNetworkSession targetSession = (PluginAvailableNetworkSession)session;
                 List<NetworkGamer> _resultGamers = new List<NetworkGamer>();
-                if (NetworkConnectionUtils.SendJoinSession(NetGlobals.IP, NetGlobals.Port, TMGlobals.TotalMinerEXEVersion, gamer, targetSession, out NetGlobals.NetSession, out _resultGamers, out NetGlobals.CurrentConnection))
+                if (NetworkConnectionUtils.SendJoinSession(NetGlobals.IP, NetGlobals.Port, gamer, targetSession, out NetGlobals.NetSession, out _resultGamers, out NetGlobals.CurrentConnection))
                 {
                     foreach (NetworkGamer _gamer in _resultGamers)
                     {
@@ -64,11 +70,12 @@ namespace TMFMP.PluginInterfaces
             }
             return null;
         }
-        public List<IAvailableNetworkSession> FindSessions()
+        public List<IAvailableNetworkSession> FindSessions(SessionMatching match)
         {
+            
             List<IAvailableNetworkSession> sessions = new List<IAvailableNetworkSession>();
 
-            NetworkConnectionUtils.SendGetSessions(NetGlobals.IP, NetGlobals.Port, TMGlobals.TotalMinerEXEVersion, ref sessions);
+            NetworkConnectionUtils.SendGetSessions(NetGlobals.IP, NetGlobals.Port,  ref sessions);
 
             return sessions;
         }
