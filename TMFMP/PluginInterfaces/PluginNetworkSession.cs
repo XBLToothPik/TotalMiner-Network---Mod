@@ -223,7 +223,10 @@ namespace TMFMP.PluginInterfaces
         #region Session Methods
         public void EndGame()
         {
-
+            if (IsHost)
+            {
+                NetMethods.SendEndSession();
+            }
         }
 
         public void StartGame()
@@ -241,7 +244,7 @@ namespace TMFMP.PluginInterfaces
         {
             if (NetGlobals.CurrentConnection.IsConnected())
             {
-                NetMethods.ParseIncomingData();
+               // NetMethods.ParseIncomingData();
                 NetMethods.SendInternalData();
             }
         }

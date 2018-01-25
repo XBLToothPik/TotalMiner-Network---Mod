@@ -30,9 +30,7 @@ namespace TMFMP.PluginInterfaces
         public PluginNetworkManager()
         {
             NetGlobals.InitNetGlobals();
-        }
-        public void Initialize(int exeVersion)
-        {
+            Globals.LoadLocalData();
         }
         #endregion
 
@@ -103,7 +101,7 @@ namespace TMFMP.PluginInterfaces
         public bool ReadData(PacketReader data, out NetworkGamer sender)
         {
             data.BaseStream.SetLength(0);
-
+            
             sender = null;
             NetMethods.ParseIncomingData();
 
@@ -122,6 +120,7 @@ namespace TMFMP.PluginInterfaces
         {
             if (NetGlobals.CurrentConnection.IsConnected() && data.BaseStream.Length > 0L)
             {
+                
                 Packet newPacket = default(Packet);
                 newPacket.Target = recipient == null ? (short)0 : recipient.ID.ID;
                 newPacket.Data = data.BaseStream.GetStreamData();

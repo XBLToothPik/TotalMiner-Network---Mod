@@ -32,7 +32,9 @@ namespace TMFMP.Network
                     writer.Write((byte)Master_Server_ConnectionType.JoinSession);
                     writer.Write(targetSession.ExtendedProperties.SessionID);
                     writer.Write(myGamer.ID.ID);
-                    writer.Write(myGamer.Gamertag);
+
+                    writer.Write(Globals.Test_LocalPName);
+                  //  writer.Write(myGamer.Gamertag);
                     writer.Flush();
 
                     Master_Server_Op_In opIn = (Master_Server_Op_In)reader.ReadByte();
@@ -134,6 +136,10 @@ namespace TMFMP.Network
                         NetType = NetworkSessionType.PlayerMatch
                     };
                     properties.Copy(newProp); 
+
+                    //### REMOVE THIS
+                    newProp.HostName = Globals.Test_LocalPName;
+
                     newProp.Write(writer);
 
                     Master_Server_Op_In opIn = (Master_Server_Op_In)reader.ReadByte();

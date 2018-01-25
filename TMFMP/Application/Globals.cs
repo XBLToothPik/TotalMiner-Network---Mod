@@ -23,41 +23,54 @@ public static class Globals
     public static ITMPluginManager PluginManager;
     public static ITMPlayer MyPlayer;
 
+    public static string Test_LocalPName;
+    public static void LoadLocalData()
+    {
+        string ap = AppUtils.GetAppPath();
+        string loc = ap + "//" + "localdata.txt";
+        if (File.Exists(loc))
+        {
+            string newName = string.Empty;
+            using (Stream xIn = File.Open(loc, FileMode.Open))
+            {
+                using (StreamReader reader = new StreamReader(xIn))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        string line = reader.ReadLine();
+                        if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                            continue;
+                        if (line.StartsWith("name:"))
+                        {
+                            newName = line.Substring(5);
+                        }
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(newName))
+            {
+                StudioForge.Engine.Services.ExceptionReporter.ReportExceptionCaught(-32, new Exception("Invalid localdata.txt.  Contact XBLToothPik"));
+            }
+            else
+                Globals.Test_LocalPName = newName;
+        }
+        else
+            StudioForge.Engine.Services.ExceptionReporter.ReportExceptionCaught(-32, new Exception("localdata.txt Not Found.  Contact XBLToothPik"));
+    }
 
     public static string InitPath;
 
     public static TMFMP.TMInternal.NpcManager InternalNPCManager;
     public static TMFMP.TMInternal.GameInstance InternalGameInstance;
 
- 
-    public static void LoadIP()
-    {
-        //if (File.Exists("ip_address.txt"))
-        //{
-        //    using (StreamReader reader = new StreamReader(File.Open("ip_address.txt", FileMode.Open)))
-        //    {
-        //        while (!reader.EndOfStream)
-        //        {
-        //            string line = reader.ReadLine();
-        //            if (line.StartsWith("#") || string.IsNullOrEmpty(line))
-        //                continue;
-        //            string ip = line;
-        //            NetGlobals.ConnectIP = ip;
-        //            break;
-        //        }
-        //        reader.Close();
-        //    }
-        //}
-    }
-
     public static void Log(string data)
     {
-        lock (Globals.LockSemaphore)
-        {
-            if (!File.Exists("logger.txt"))
-                File.Create("logger.txt").Close();
-            File.AppendAllLines("logger.txt", new string[] { data });
-        }
+        //lock (Globals.LockSemaphore)
+        //{
+        //    if (!File.Exists("logger.txt"))
+        //        File.Create("logger.txt").Close();
+        //    File.AppendAllLines("logger.txt", new string[] { data });
+        //}
     }
 
 }
