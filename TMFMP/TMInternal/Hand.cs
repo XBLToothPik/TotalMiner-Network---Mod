@@ -82,13 +82,13 @@ namespace TMFMP.TMInternal
             hand._InternalHandObject = internal_hand_object;
             return hand;
         }
-        public static Hand CreateFromNPCBase(NpcBase npc, InventoryHand hand)
-        {
-            Type thisType = TM.Reflection.TMReflection.GetAsmType("StudioForge.TotalMiner.Hand");
-            Type actorType = TM.Reflection.TMReflection.GetAsmType("StudioForge.TotalMiner.Actor");
-            ConstructorInfo ctor = thisType.GetConstructor(new Type[] { actorType, typeof(InventoryHand) });
-            Hand newHand = Hand.CreateFromInternalHandObject(ctor.Invoke(new object[] { npc.NpcBaseObject, hand }));
-            return newHand;
-        }
+        //public static Hand CreateFromNPCBase(NpcBase npc, InventoryHand hand)
+        //{
+        //    Type thisType = TM.Reflection.TMReflection.GetAsmType("StudioForge.TotalMiner.Hand");
+        //    Type actorType = TM.Reflection.TMReflection.GetAsmType("StudioForge.TotalMiner.Actor");
+        //    ConstructorInfo ctor = thisType.GetConstructor(new Type[] { actorType, typeof(InventoryHand) });
+        //    Hand newHand = Hand.CreateFromInternalHandObject(ctor.Invoke(new object[] { npc.NpcBaseObject, hand }));
+        //    return newHand;
+        //}
     }
 }

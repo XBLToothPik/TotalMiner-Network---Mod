@@ -1,0 +1,8 @@
+﻿# TMFMP by XBLToothPIk
+# These are comment lines
+# Local Data File
+# Default port is 5786
+
+NAME:YourUsername
+IP:ServerIP
+PORT:ServerPort

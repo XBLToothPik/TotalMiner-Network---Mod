@@ -12,8 +12,6 @@ namespace TMFMP.Network
 {
     public static class NetGlobals
     {
-        public static string IP = "74.208.169.59";//"74.208.169.59";
-        public static int Port = 5786;
         public static ITMNetworkManager NetworkManager;
         public static ITMPluginNet NetPlugin;
         public static PluginNetworkSession NetSession;

@@ -10,9 +10,6 @@ namespace TMFMP
 {
     public static class TMUtils
     {
-        public static void PatchGame()
-        {
-        }
   
 
         public static BehaviourTree GetBehaviourTree(string fullPath)

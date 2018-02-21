@@ -11,5 +11,9 @@ public static class AppUtils
     {
         return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     }
+    public static System.IO.Stream GetResourceAsStream(string resName)
+    {
+        return Assembly.GetExecutingAssembly().GetManifestResourceStream(string.Format("TMFMP.Resources.{0}", resName));
+    }
 }
 

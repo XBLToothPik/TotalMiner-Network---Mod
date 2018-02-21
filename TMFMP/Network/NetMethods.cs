@@ -43,8 +43,6 @@ namespace TMFMP.Network
             packet.Sender = sender;
             packet.Data = _data;
             NetGlobals.TotalMinerConnectionPacketBuffer_In.Enqueue(packet);
-
-            Globals.Log("ReadTotalMinerGameData: " + "(sender: " + sender.ToString() + ")" + "(datalen: " + len.ToString() + ")");
         }
         public static void SendTotalMinerGameData()
         {

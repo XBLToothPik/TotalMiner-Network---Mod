@@ -30,7 +30,6 @@ namespace TMFMP.PluginInterfaces
         public PluginNetworkManager()
         {
             NetGlobals.InitNetGlobals();
-            Globals.LoadLocalData();
         }
         #endregion
 
@@ -39,7 +38,7 @@ namespace TMFMP.PluginInterfaces
         {
             NetGlobals.MyGamer = new NetworkGamer(host.ID, host.Gamertag);
             int newSessionID = -1;
-            if (NetworkConnectionUtils.SendCreateSession(NetGlobals.IP, NetGlobals.Port, properties, host.ID.ID, out newSessionID, out NetGlobals.CurrentConnection))
+            if (NetworkConnectionUtils.SendCreateSession(LocalData.ServerIP, LocalData.ServerPort, properties, host.ID.ID, out newSessionID, out NetGlobals.CurrentConnection))
             {
                 SessionPropertiesExtended newProp = new SessionPropertiesExtended();
                 properties.Copy(newProp);
@@ -56,7 +55,7 @@ namespace TMFMP.PluginInterfaces
                 EndSession();
                 PluginAvailableNetworkSession targetSession = (PluginAvailableNetworkSession)session;
                 List<NetworkGamer> _resultGamers = new List<NetworkGamer>();
-                if (NetworkConnectionUtils.SendJoinSession(NetGlobals.IP, NetGlobals.Port, gamer, targetSession, out NetGlobals.NetSession, out _resultGamers, out NetGlobals.CurrentConnection))
+                if (NetworkConnectionUtils.SendJoinSession(LocalData.ServerIP, LocalData.ServerPort, gamer, targetSession, out NetGlobals.NetSession, out _resultGamers, out NetGlobals.CurrentConnection))
                 {
                     foreach (NetworkGamer _gamer in _resultGamers)
                     {
@@ -71,9 +70,10 @@ namespace TMFMP.PluginInterfaces
         public List<IAvailableNetworkSession> FindSessions(SessionMatching match)
         {
             
+
             List<IAvailableNetworkSession> sessions = new List<IAvailableNetworkSession>();
 
-            NetworkConnectionUtils.SendGetSessions(NetGlobals.IP, NetGlobals.Port,  ref sessions);
+            NetworkConnectionUtils.SendGetSessions(LocalData.ServerIP, LocalData.ServerPort,  ref sessions);
 
             return sessions;
         }

@@ -15,7 +15,7 @@ using StudioForge.Engine.GamerServices;
 using System.IO;
 using TMFMP.TMInternal;
 using System.Reflection;
-
+using TMFMP.Patch;
 namespace TMFMP
 {
     public class PluginMain : ITMPlugin
@@ -25,15 +25,17 @@ namespace TMFMP
         {
             Globals.PluginManager = mgr;
             Globals.InitPath = path;
+            PatchGlobals.PatchGame();
+
+            LocalData.Init();
+            LocalData.LoadOrCreate();
         }
         public void InitializeGame(ITMGame game)
         {
-            Globals.Game = game;
             TM.Reflection.TMReflection.ProvideAssembly(game);
-            TMUtils.PatchGame();
-            Globals.MyPlayer = Globals.Game.GetLocalPlayer(PlayerIndex.One);
 
-            Globals.InternalNPCManager = TMInternal.NpcManager.GetFromAPINpcManager(Globals.Game.World.NpcManager);
+            Globals.Game = game;
+            Globals.MyPlayer = Globals.Game.GetLocalPlayer(PlayerIndex.One);
             Globals.InternalGameInstance = TMInternal.GameInstance.GetFromAPIGame(Globals.Game);
         }
         #endregion
@@ -41,22 +43,10 @@ namespace TMFMP
         #region XNA-Like Methods
         public void Update()
         {
-            //MapUtils.ProvideMap(Globals.Game.World.Map);
-            //Network.NetGlobals.ConnectString = !Network.NetGlobals.IsConnected ? "Not Connected" : "Connected";
-            //
-            //if (Network.NetGlobals.IsConnected)
-            //{
-            //    TMFMP.Events.GameChangeMonitor.Update();
-            //    Network.NetGlobals.ThisClient.UpdateLocal();
-            //    Network.NetGlobals.ThisClient.UpdateRemote();
-            //}
         }
 
         public void Draw(ITMPlayer player, ITMPlayer virtualPlayer)
         {
-            StudioForge.Engine.CoreGlobals.SpriteBatch.Begin();
-
-            StudioForge.Engine.CoreGlobals.SpriteBatch.End();
         }
 
         #endregion
@@ -64,14 +54,16 @@ namespace TMFMP
         #region Input Methods
         public bool HandleInput(ITMPlayer player)
         {
-
-
             return false;
         }
         #endregion
 
-        #region Plugin Activation Methods
+        #region Plugin Methods
 
+        public void UnloadMod()
+        {
+            
+        }
         #endregion
 
         #region APIMethods
@@ -89,5 +81,7 @@ namespace TMFMP
         {
         }
         #endregion
+
+
     }
 }

@@ -18,6 +18,8 @@ namespace TMFMP.Network
             resultSession = null;
             resultConnection = null;
             existingRemotes = null;
+            if (string.IsNullOrEmpty(LocalData.PlayerName))
+                return false;
             try
             {
                 TcpClient connection = new TcpClient();
@@ -33,8 +35,7 @@ namespace TMFMP.Network
                     writer.Write(targetSession.ExtendedProperties.SessionID);
                     writer.Write(myGamer.ID.ID);
 
-                    writer.Write(Globals.Test_LocalPName);
-                  //  writer.Write(myGamer.Gamertag);
+                    writer.Write(LocalData.PlayerName);
                     writer.Flush();
 
                     Master_Server_Op_In opIn = (Master_Server_Op_In)reader.ReadByte();
@@ -90,7 +91,6 @@ namespace TMFMP.Network
 
                     writer.Write((byte)Master_Server_Op_Out.Connect);
                     writer.Write((byte)Master_Server_ConnectionType.GetSessions);
-                   // writer.Write(exeVersion);
                     writer.Flush();
 
                     Master_Server_Op_In opIn = (Master_Server_Op_In)reader.ReadByte();
@@ -130,16 +130,12 @@ namespace TMFMP.Network
                     writer.Write((byte)Master_Server_Op_Out.Connect);
                     writer.Write((byte)Master_Server_ConnectionType.CreateSession);
 
-                    SessionPropertiesExtended newProp = new SessionPropertiesExtended()
-                    {
-                        HostID = hostGID,
-                        NetType = NetworkSessionType.PlayerMatch
-                    };
-                    properties.Copy(newProp); 
 
-                    //### REMOVE THIS
-                    newProp.HostName = Globals.Test_LocalPName;
-
+                    SessionPropertiesExtended newProp = new SessionPropertiesExtended();
+                    properties.Copy(newProp);
+                    newProp.HostID = hostGID;
+                    newProp.NetType = NetworkSessionType.PlayerMatch;
+                    newProp.HostName = LocalData.PlayerName;
                     newProp.Write(writer);
 
                     Master_Server_Op_In opIn = (Master_Server_Op_In)reader.ReadByte();

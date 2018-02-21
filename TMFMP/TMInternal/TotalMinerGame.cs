@@ -15,31 +15,6 @@ namespace TMFMP.TMInternal
                 return this._InternalTotalMinerObject;
             }
         }
-        public Type InternalTotalMinerGameType
-        {
-            get
-            {
-                return this._InternalTotalMinerObject.GetType();
-            }
-        }
-        
-        public NetworkManager NetworkManager
-        {
-            get
-            {
-                return NetworkManager.GetFromTotalMinerGame(this);
-            }
-            set
-            {
-                Type thisType = this.InternalTotalMinerGameType;
-                Type networkManagerType = this.NetworkManager.InternalNetworkManagerObjectType;
-
-                FieldInfo networkManagerField = thisType.GetField("networkManager", BindingFlags.NonPublic | BindingFlags.Instance);
-                networkManagerField.SetValue(this._InternalTotalMinerObject, value._InternalNetworkManagerObject);
-            }
-        }
-
-
         public static void AddNotification(Assembly tmAsm, string msg, bool ignoreGuide)
         {
             Type tmGameType = tmAsm.GetType("StudioForge.TotalMiner.TotalMinerGame");
